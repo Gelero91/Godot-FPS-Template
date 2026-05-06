@@ -1,0 +1,10 @@
+# Godot cache — jamais versionné
+.godot/
+
+# Fichiers temporaires
+*.tmp
+*.bak
+
+# Fichiers parasites
+arborescence.txt
+github_url_extractor.html
