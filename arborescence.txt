@@ -1,0 +1,32 @@
+res://
+├── addons/              ← plugins tiers
+├── assets/
+│   ├── player/
+│   │   ├── player.tscn
+│   │   ├── player.gd
+│   │   └── weapons/
+│   │       ├── weapon_base.gd
+│   │       └── melee/
+│   │           ├── mace.tscn
+│   │           └── mace.gd
+│   ├── enemies/
+│   │   ├── enemy_base.tscn
+│   │   └── enemy_base.gd
+│   ├── props/
+│   │   ├── door/
+│   │   │   ├── door.tscn
+│   │   │   └── door.gd
+│   │   └── pickups/
+│   │       ├── health_potion/
+│   │       │   ├── health_potion.tscn
+│   │       │   └── health_potion.gd
+│   │       └── pickup_base.gd
+│   └── maps/
+│       └── main.tscn
+├── src/                 ← systèmes transversaux (autoloads, core)
+│   ├── action_ray_cast_3d.gd
+│   └── game_manager.gd
+└── raw_assets/          ← fichiers bruts (textures, modèles, sons)
+	├── textures/
+	├── models/
+	└── sounds/

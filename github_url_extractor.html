@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>GitHub URL Extractor</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: sans-serif; background: #1e1e2e; color: #cdd6f4; padding: 2rem; }
+    h1 { font-size: 1.4rem; margin-bottom: 1.5rem; color: #cba6f7; }
+    label { display: block; font-size: 0.85rem; color: #a6adc8; margin-bottom: 6px; }
+    textarea {
+      width: 100%; height: 160px; background: #181825; color: #cdd6f4;
+      border: 1px solid #45475a; border-radius: 8px; padding: 10px;
+      font-family: monospace; font-size: 12px; resize: vertical;
+    }
+    .row { display: flex; gap: 10px; margin: 12px 0; align-items: center; }
+    select, button {
+      background: #313244; color: #cdd6f4; border: 1px solid #45475a;
+      border-radius: 6px; padding: 8px 14px; font-size: 14px; cursor: pointer;
+    }
+    button:hover { background: #45475a; }
+    #stats { font-size: 13px; color: #a6adc8; margin-bottom: 12px; min-height: 18px; }
+    .file-row {
+      background: #181825; border: 1px solid #313244; border-radius: 8px;
+      padding: 10px 14px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .file-info { flex: 1; min-width: 0; }
+    .file-path { font-size: 13px; font-weight: 600; color: #cba6f7; }
+    .file-url {
+      font-size: 11px; color: #6c7086; font-family: monospace;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .copy-btn {
+      font-size: 12px; padding: 5px 12px; flex-shrink: 0;
+      background: #313244; border-radius: 6px;
+    }
+    .copy-btn.ok { background: #a6e3a1; color: #1e1e2e; border-color: #a6e3a1; }
+  </style>
+</head>
+<body>
+
+<h1>🔗 GitHub URL Extractor</h1>
+
+<label>Colle ici le JSON de l'API GitHub (git/trees?recursive=1) :</label>
+<textarea id="jsonInput" placeholder='{"tree": [...], ...}'></textarea>
+
+<div class="row">
+  <select id="filterExt">
+    <option value="">Tous les fichiers</option>
+    <option value=".gd" selected>.gd — GDScript</option>
+    <option value=".tscn">.tscn — Scènes</option>
+    <option value=".tres">.tres — Ressources</option>
+    <option value=".md">.md — Markdown</option>
+  </select>
+  <button onclick="extract()">Extraire</button>
+</div>
+
+<div id="stats"></div>
+
+<div id="allUrlsBlock" style="display:none; margin-bottom:16px;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+    <label style="margin:0;">Toutes les URLs :</label>
+    <button id="copyAllBtn" class="copy-btn" onclick="copyAll()">📋 Tout copier</button>
+  </div>
+  <textarea id="allUrls" style="height:120px;" readonly></textarea>
+</div>
+
+<div id="results"></div>
+
+<script>
+  const REPO   = "Gelero91/Godot-FPS-Template";
+  const BRANCH = "main";
+
+  function rawUrl(path) {
+    return `https://raw.githubusercontent.com/${REPO}/${BRANCH}/${path}`;
+  }
+
+  function extract() {
+    const json  = document.getElementById("jsonInput").value.trim();
+    const ext   = document.getElementById("filterExt").value;
+    const stats = document.getElementById("stats");
+    const out   = document.getElementById("results");
+
+    if (!json) { stats.textContent = "Colle d'abord le JSON."; return; }
+
+    let data;
+    try { data = JSON.parse(json); }
+    catch(e) { stats.textContent = "JSON invalide : " + e.message; return; }
+
+    const files = (data.tree || []).filter(f =>
+      f.type === "blob" && (!ext || f.path.endsWith(ext))
+    );
+
+    stats.textContent = `${files.length} fichier(s) trouvé(s)${ext ? " avec l'extension " + ext : ""}`;
+    out.innerHTML = "";
+
+    const urls = files.map(f => rawUrl(f.path));
+    const allUrlsBlock = document.getElementById("allUrlsBlock");
+    const allUrls = document.getElementById("allUrls");
+    if (urls.length > 0) {
+      allUrls.value = urls.join("\n");
+      allUrlsBlock.style.display = "block";
+    } else {
+      allUrlsBlock.style.display = "none";
+    }
+
+    files.forEach(f => {
+      const url = rawUrl(f.path);
+      const div = document.createElement("div");
+      div.className = "file-row";
+      div.innerHTML = `
+        <div class="file-info">
+          <div class="file-path">${f.path}</div>
+          <div class="file-url">${url}</div>
+        </div>
+        <button class="copy-btn" onclick="copyOne('${url}', this)">Copier</button>
+      `;
+      out.appendChild(div);
+    });
+  }
+
+  function copyOne(url, btn) {
+    navigator.clipboard.writeText(url).then(() => {
+      btn.textContent = "✓ Copié !";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = "Copier"; btn.classList.remove("ok"); }, 1500);
+    });
+  }
+
+  function copyAll() {
+    const ta = document.getElementById("allUrls");
+    if (!ta.value) return;
+    navigator.clipboard.writeText(ta.value).then(() => {
+      const btn = document.getElementById("copyAllBtn");
+      btn.textContent = "✓ Copié !";
+      btn.classList.add("ok");
+      setTimeout(() => { btn.textContent = "📋 Tout copier"; btn.classList.remove("ok"); }, 1500);
+    });
+  }
+
+  document.getElementById("jsonInput").addEventListener("paste", () => setTimeout(extract, 80));
+</script>
+
+</body>
+</html>

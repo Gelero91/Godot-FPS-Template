@@ -1,7 +1,8 @@
 [gd_scene format=4 uid="uid://cck3oujvclluc"]
 
-[ext_resource type="Script" uid="uid://i53t53vly505" path="res://script/Player/fps_controller_proto.gd" id="1_4flbx"]
-[ext_resource type="Script" uid="uid://chqp06xvlax07" path="res://script/Player/action_ray_cast_3d.gd" id="2_onrkg"]
+[ext_resource type="Script" uid="uid://i53t53vly505" path="res://assets/player/fps_controller_proto.gd" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://chqp06xvlax07" path="res://assets/player/action_ray_cast_3d.gd" id="2_onrkg"]
+
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_4flbx"]
 radius = 0.4
